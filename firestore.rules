@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(email) {
+      return isSignedIn() && request.auth.token.email == email;
+    }
+
+    function isAdmin() {
+      // Hardcoded admin email for professional setup
+      return isSignedIn() && request.auth.token.email == 'apradeephere43@gmail.com';
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Products Collection
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders Collection
+    match /orders/{orderId} {
+      allow create: if true; // Allow guests to place orders, but we recommend signing in for tracking
+      allow read: if isAdmin() || (isSignedIn() && resource.data.customerDetails.email == request.auth.token.email);
+      allow update: if isAdmin(); // Only admins can update order status
+      allow delete: if isAdmin();
+    }
+  }
+}

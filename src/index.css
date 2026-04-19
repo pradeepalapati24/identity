@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --color-bg: #ffffff;
+  --color-ink: #000000;
+  --color-accent: #ff3b3b;
+  --color-muted: #f8f8f8;
+  --color-text-gray: #707070;
+  --color-border: #eeeeee;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased bg-bg text-ink;
+  }
+}
+
+@layer utilities {
+  .hero-title {
+    @apply text-[88px] font-black leading-[0.9] tracking-[-4px] uppercase;
+  }
+  .nav-link {
+    @apply text-[13px] font-medium uppercase tracking-[1px] hover:text-accent transition-colors;
+  }
+  .btn-premium, .add-btn {
+    @apply bg-black text-white px-[28px] py-[14px] text-[14px] font-bold tracking-[2px] uppercase transition-all duration-300 border border-black cursor-pointer inline-flex items-center justify-center;
+  }
+  .btn-premium:hover, .add-btn:hover {
+    @apply bg-white text-black border-black;
+  }
+  .card-premium {
+    @apply bg-white p-[40px] rounded-[12px] shadow-[0_10px_30px_rgba(0,0,0,0.05)];
+  }
+  .pill-card {
+    @apply bg-muted rounded-[4px] border border-transparent hover:border-ink transition-all duration-300;
+  }
+  .size-btn {
+    @apply w-[45px] h-[45px] border border-border flex items-center justify-center text-[13px] cursor-pointer bg-white transition-all duration-300;
+  }
+  .size-btn.active {
+    @apply bg-ink text-white border-ink;
+  }
+  .add-btn {
+    @apply w-full;
+  }
+  .admin-pill {
+    @apply fixed bottom-[30px] left-10 bg-ink text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-[1px] flex items-center gap-2 cursor-pointer z-[100];
+  }
+  .admin-input {
+    @apply w-full bg-muted/50 border border-border px-4 py-3 rounded-lg text-xs font-medium outline-none focus:border-ink focus:bg-white transition-all placeholder:text-black/20;
+  }
+}

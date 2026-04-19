@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['name', 'price', 'imageUrl', 'createdAt']) &&
+             data.keys().size() == 4 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.price is number && data.price > 0 &&
+             data.imageUrl is string && data.imageUrl.size() < 1000 &&
+             data.createdAt is timestamp;
+    }
+
+    match /products/{productId} {
+      allow list, get: if true; // Publicly readable
+      
+      allow create: if 
+        isValidId(productId) && 
+        isValidProduct(incoming()) &&
+        incoming().createdAt == request.time;
+        
+      allow update: if
+        isValidId(productId) &&
+        isValidProduct(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'price', 'imageUrl', 'updatedAt']);
+        
+      allow delete: if false; // Only admins (if implemented)
+    }
+  }
+}
